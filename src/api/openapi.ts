@@ -12,11 +12,6 @@ import {
 export function generateOpenApiSpec() {
   const registry = new OpenAPIRegistry();
 
-  registry.register('UploadRequest', UploadRequestSchema);
-  registry.register('UploadResponse', UploadResponseSchema);
-  registry.register('DiaryCreateRequest', DiaryCreateRequestSchema);
-  registry.register('Diary', DiarySchema);
-
   registry.registerPath({
     method: 'post',
     path: '/upload',

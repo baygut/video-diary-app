@@ -1,0 +1,265 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Video Diary Internal API",
+    "version": "1.0.0",
+    "description": "Internal SQLite-backed API for the Video Diary app"
+  },
+  "servers": [
+    {
+      "url": "internal://"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "UploadResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "examples": [
+              "550e8400-e29b-41d4-a716-446655440000"
+            ]
+          },
+          "uri": {
+            "type": "string",
+            "examples": [
+              "file:///path/to/video.mp4"
+            ]
+          },
+          "mimeType": {
+            "type": "string",
+            "examples": [
+              "video/mp4"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "examples": [
+              "2026-06-25T12:00:00.000Z"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "uri",
+          "mimeType",
+          "createdAt"
+        ]
+      },
+      "UploadRequest": {
+        "type": "object",
+        "properties": {
+          "uri": {
+            "type": "string",
+            "minLength": 1,
+            "description": "File URI of the video",
+            "examples": [
+              "file:///path/to/video.mp4"
+            ]
+          },
+          "mimeType": {
+            "type": "string",
+            "minLength": 1,
+            "description": "MIME type",
+            "examples": [
+              "video/mp4"
+            ]
+          }
+        },
+        "required": [
+          "uri",
+          "mimeType"
+        ]
+      },
+      "Diary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "examples": [
+              "660e8400-e29b-41d4-a716-446655440001"
+            ]
+          },
+          "uploadId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "uploadId",
+          "name",
+          "description",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "DiaryCreateRequest": {
+        "type": "object",
+        "properties": {
+          "uploadId": {
+            "type": "string",
+            "format": "uuid",
+            "examples": [
+              "550e8400-e29b-41d4-a716-446655440000"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50,
+            "description": "Title of the diary entry",
+            "examples": [
+              "Sunset at the beach"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 200,
+            "examples": [
+              "A beautiful evening."
+            ]
+          }
+        },
+        "required": [
+          "uploadId",
+          "name"
+        ]
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/upload": {
+      "post": {
+        "summary": "Upload a video file reference",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Upload created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/diary": {
+      "post": {
+        "summary": "Create a diary entry",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiaryCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Diary entry created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Diary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "404": {
+            "description": "Upload not found"
+          }
+        }
+      },
+      "get": {
+        "summary": "List all diary entries",
+        "responses": {
+          "200": {
+            "description": "List of diary entries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Diary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/diary/{id}": {
+      "get": {
+        "summary": "Get a diary entry by ID",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Diary entry",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Diary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    }
+  }
+}
