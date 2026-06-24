@@ -1,0 +1,21 @@
+{
+  "diary": {
+    "title": "My Diary",
+    "empty": "Your video diary entries will appear here.",
+    "upload": "Upload Video",
+    "name": "Entry Name",
+    "description": "Description",
+    "namePlaceholder": "e.g. Sunset at the beach",
+    "descriptionPlaceholder": "What was this moment about?",
+    "nameMaxLength": "Max 50 characters",
+    "descriptionMaxLength": "Max 200 characters",
+    "save": "Save Entry"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "error": "Something went wrong",
+    "loading": "Loading..."
+  }
+}

@@ -7,9 +7,8 @@ import { useColorScheme as useRNColorScheme } from 'react-native';
 export function useColorScheme() {
   const [hasHydrated, setHasHydrated] = useState(false);
 
-  useEffect(() => {
-    setHasHydrated(true);
-  }, []);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setHasHydrated(true); }, []);
 
   const colorScheme = useRNColorScheme();
 
