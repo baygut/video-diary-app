@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
+import { useTheme } from "@/hooks/use-theme";
 import { cn } from "@/utils/cn";
 import type { SelectedVideo } from "@/utils/video-files";
 
@@ -20,6 +21,7 @@ export function VideoPickerField({
   onPress,
 }: VideoPickerFieldProps) {
   const { t } = useTranslation();
+  const theme = useTheme();
 
   return (
     <Pressable
@@ -36,7 +38,7 @@ export function VideoPickerField({
       ) : (
         <View className="items-center gap-3 px-6 py-10">
           <View className="h-16 w-16 items-center justify-center rounded-full bg-app-accent-muted">
-            <Ionicons color="#0F766E" name="videocam-outline" size={28} />
+            <Ionicons color={theme.accent} name="videocam-outline" size={28} />
           </View>
           <ThemedText type="smallBold">{t("diary.selectVideo")}</ThemedText>
           <ThemedText themeColor="textSecondary" type="small" className="text-center">

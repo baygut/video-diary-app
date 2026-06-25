@@ -9,8 +9,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.anonymous.video-diary-app",
-      "appleTeamId": "69W6BBGGPT"
+      "bundleIdentifier": "com.anonymous.video-diary-app"
     },
     "android": {
       "adaptiveIcon": {
@@ -20,9 +19,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ]
+      "permissions": ["android.permission.RECORD_AUDIO"],
+      "package": "com.anonymous.videodiaryapp"
     },
     "web": {
       "output": "static",

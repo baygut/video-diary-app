@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/immutability */
 import { useEffect } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   runOnJS,
@@ -161,8 +161,8 @@ export function VideoSegmentRangeTrimmer({
     });
 
   return (
-    <View style={styles.root}>
-      <View style={styles.labels}>
+    <View className="gap-2">
+      <View className="flex-row justify-between px-0.5">
         <ThemedText type="small" className="text-white/70 tabular-nums">
           {formatTimeLabel(startTime)}
         </ThemedText>
@@ -175,132 +175,55 @@ export function VideoSegmentRangeTrimmer({
       </View>
 
       <View
-        style={styles.trackWrap}
+        className="h-11 justify-center"
         onLayout={(e) => {
           trackWidthSV.value = e.nativeEvent.layout.width;
         }}
       >
-        <View style={styles.track} />
-        <Animated.View style={[styles.highlight, highlightStyle]} />
-        <Animated.View style={[styles.highlightBorder, highlightStyle]} />
+        <View className="absolute inset-x-0 h-1.5 rounded-full bg-app-on-dark/20" />
+        <Animated.View
+          className="absolute bottom-[9px] top-[9px] bg-app-video"
+          style={highlightStyle}
+        />
+        <Animated.View
+          className="absolute bottom-2 top-2 border-2 border-app-on-dark"
+          style={highlightStyle}
+        />
 
         {onChangePlayhead ? (
           <GestureDetector gesture={playheadGesture}>
-            <Animated.View style={[styles.playheadWrap, playheadStyle]}>
-              <View style={styles.playheadThumb} />
-              <View style={styles.playheadStem} />
+            <Animated.View
+              className="absolute z-[3] h-11 w-[34px] -translate-x-[17px] items-center justify-center"
+              style={playheadStyle}
+            >
+              <View className="absolute top-0 h-[18px] w-[18px] rounded-full border-2 border-app-handle-border/35 bg-app-play" />
+              <View className="h-8 w-1 rounded-full bg-app-play shadow" />
             </Animated.View>
           </GestureDetector>
         ) : null}
 
         <GestureDetector gesture={leftGesture}>
           <Animated.View
-            style={[styles.handleWrap, styles.handleLeft, leftHandleStyle]}
+            className="absolute h-11 w-[34px] -translate-x-[34px] items-center justify-center"
+            style={leftHandleStyle}
           >
-            <View style={styles.handleRail} />
+            <View className="h-[38px] w-[34px] items-center justify-center rounded-l border-2 border-r-0 border-app-on-dark bg-app-on-dark/90 shadow">
+              <View className="h-6 w-0.5 rounded-full bg-app-icon-muted/55" />
+            </View>
           </Animated.View>
         </GestureDetector>
 
         <GestureDetector gesture={rightGesture}>
           <Animated.View
-            style={[styles.handleWrap, styles.handleRight, rightHandleStyle]}
+            className="absolute h-11 w-[34px] items-center justify-center"
+            style={rightHandleStyle}
           >
-            <View style={styles.handleRail} />
+            <View className="h-[38px] w-[34px] items-center justify-center rounded-r border-2 border-l-0 border-app-on-dark bg-app-on-dark/90 shadow">
+              <View className="h-6 w-0.5 rounded-full bg-app-icon-muted/55" />
+            </View>
           </Animated.View>
         </GestureDetector>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  root: {
-    gap: 8,
-  },
-  labels: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 2,
-  },
-  trackWrap: {
-    height: 44,
-    justifyContent: "center",
-  },
-  track: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "rgba(255,255,255,0.2)",
-  },
-  highlight: {
-    position: "absolute",
-    top: 10,
-    bottom: 10,
-    backgroundColor: "rgba(251, 191, 36, 0.18)",
-    borderRadius: 8,
-  },
-  highlightBorder: {
-    position: "absolute",
-    top: 8,
-    bottom: 8,
-    borderColor: "rgba(251, 191, 36, 0.95)",
-    borderWidth: 2,
-    borderRadius: 10,
-  },
-  handleWrap: {
-    position: "absolute",
-    width: 44,
-    height: 44,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  handleLeft: {
-    transform: [{ translateX: -22 }],
-  },
-  handleRight: {
-    transform: [{ translateX: -22 }],
-  },
-  handleRail: {
-    width: 10,
-    height: 34,
-    borderRadius: 5,
-    borderWidth: 2,
-    borderColor: "rgba(0,0,0,0.32)",
-    backgroundColor: "#FFFFFF",
-    shadowColor: "#000",
-    shadowOpacity: 0.4,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 1 },
-  },
-  playheadWrap: {
-    position: "absolute",
-    width: 34,
-    height: 44,
-    alignItems: "center",
-    justifyContent: "center",
-    transform: [{ translateX: -17 }],
-    zIndex: 3,
-  },
-  playheadThumb: {
-    position: "absolute",
-    top: 0,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    borderWidth: 2,
-    borderColor: "rgba(0,0,0,0.35)",
-    backgroundColor: "#FACC15",
-  },
-  playheadStem: {
-    width: 4,
-    height: 32,
-    borderRadius: 2,
-    backgroundColor: "#FACC15",
-    shadowColor: "#000",
-    shadowOpacity: 0.45,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 1 },
-  },
-});

@@ -27,6 +27,7 @@ import {
   useTrimVideo,
   useUploadVideo,
 } from "@/hooks/queries";
+import { useTheme } from "@/hooks/use-theme";
 import { useAppStore } from "@/store/app-store";
 import { debugLog } from "@/utils/debug-log";
 import {
@@ -45,6 +46,7 @@ function waitForUiFrame() {
 
 export function DiaryScreen() {
   const { t } = useTranslation();
+  const theme = useTheme();
   const router = useRouter();
   const sortOrder = useAppStore((state) => state.diaryListSortOrder);
   const { data: diaries, isPending, isError } = useDiaries();
@@ -207,7 +209,7 @@ export function DiaryScreen() {
               <ActivityIndicator />
             ) : (
               <>
-                <Ionicons color="#60646C" name="film-outline" size={40} />
+                <Ionicons color={theme.iconMuted} name="film-outline" size={40} />
                 <ThemedText themeColor="textSecondary" className="text-center">
                   {isError ? t("common.error") : t("diary.empty")}
                 </ThemedText>
@@ -235,7 +237,7 @@ export function DiaryScreen() {
         className="absolute bottom-8 right-6 h-14 w-14 items-center justify-center rounded-full bg-app-accent shadow-lg"
         onPress={openModal}
       >
-        <Ionicons color="#FFFFFF" name="add" size={28} />
+        <Ionicons color={theme.onAccent} name="add" size={28} />
       </Pressable>
 
       <NewEntryModal

@@ -67,7 +67,9 @@
     "loading": "Yükleniyor...",
     "next": "İleri",
     "back": "Geri",
-    "view": "Görüntüle"
+    "view": "Görüntüle",
+    "more": "Daha fazla",
+    "less": "Daha az"
   },
   "screens": {
     "diary": {

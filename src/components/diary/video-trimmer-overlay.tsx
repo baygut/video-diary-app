@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 
 import type { VideoSegmentProps } from "./video-segment-types";
 import { VideoSegmentRangeTrimmer } from "./video-segment-range-trimmer";
@@ -22,7 +22,10 @@ export function VideoTrimmerOverlay({
   onChangeStart,
 }: VideoTrimmerOverlayProps) {
   return (
-    <View style={styles.overlay} pointerEvents="box-none">
+    <View
+      className="absolute inset-x-0 bottom-0 bg-app-overlay/60 px-3 pb-3.5 pt-3.5"
+      pointerEvents="box-none"
+    >
       <VideoSegmentRangeTrimmer
         disabled={disabled}
         durationSeconds={durationSeconds}
@@ -38,16 +41,3 @@ export function VideoTrimmerOverlay({
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  overlay: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingHorizontal: 12,
-    paddingTop: 14,
-    paddingBottom: 14,
-    backgroundColor: "rgba(0,0,0,0.58)",
-  },
-});

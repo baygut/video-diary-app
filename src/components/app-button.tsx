@@ -1,6 +1,7 @@
 import { ActivityIndicator, Pressable, type PressableProps } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
+import { useTheme } from "@/hooks/use-theme";
 import { cn } from "@/utils/cn";
 
 type AppButtonProps = Omit<PressableProps, "children"> & {
@@ -22,6 +23,7 @@ export function AppButton({
   variant = "primary",
   ...props
 }: AppButtonProps) {
+  const theme = useTheme();
   const isDisabled = disabled || loading;
 
   return (
@@ -44,7 +46,7 @@ export function AppButton({
         <>
           {loading ? (
             <ActivityIndicator
-              color={variant === "primary" ? "#FFFFFF" : undefined}
+              color={variant === "primary" ? theme.onAccent : undefined}
             />
           ) : null}
           {!loading ? (

@@ -67,7 +67,9 @@
     "loading": "Loading...",
     "next": "Next",
     "back": "Back",
-    "view": "View"
+    "view": "View",
+    "more": "More",
+    "less": "Less"
   },
   "screens": {
     "diary": {

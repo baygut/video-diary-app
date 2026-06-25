@@ -60,7 +60,8 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "generate": "npx tsx scripts/generate-openapi.ts"
+    "generate": "npx tsx scripts/generate-openapi.ts",
+    "clean": "rm -rf .expo .expo-shared node_modules package-lock.json && rm -rf ~/Library/Developer/Xcode/DerivedData && npm install"
   },
   "private": true
 }

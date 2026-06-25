@@ -27,6 +27,7 @@ export default function TabsLayout() {
           {t("tabs.settings")}
         </NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon
+          sf={"gearshape"}
           src={require("@/assets/images/tabIcons/explore.png")}
           renderingMode="template"
         />

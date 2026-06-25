@@ -1,5 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, View } from "react-native";
+
+import { useTheme } from "@/hooks/use-theme";
 
 type VideoPlaybackOverlayButtonProps = {
   isPlaying: boolean;
@@ -10,6 +12,8 @@ export function VideoPlaybackOverlayButton({
   isPlaying,
   onPress,
 }: VideoPlaybackOverlayButtonProps) {
+  const theme = useTheme();
+
   return (
     <Pressable
       accessibilityLabel={isPlaying ? "Pause video" : "Play video"}
@@ -17,34 +21,14 @@ export function VideoPlaybackOverlayButton({
       className="absolute inset-0 items-center justify-center"
       onPress={onPress}
     >
-      <View style={styles.playButton}>
+      <View className="h-[68px] w-[68px] items-center justify-center rounded-full border border-app-on-dark/70 bg-app-play/90 shadow-lg">
         <Ionicons
-          color="#111827"
+          color={theme.onPlay}
           name={isPlaying ? "pause" : "play"}
           size={34}
-          style={!isPlaying ? styles.playIcon : undefined}
+          style={!isPlaying ? { marginLeft: 3 } : undefined}
         />
       </View>
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  playButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    width: 68,
-    height: 68,
-    borderRadius: 34,
-    backgroundColor: "rgba(250, 204, 21, 0.92)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.7)",
-    shadowColor: "#000",
-    shadowOpacity: 0.45,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-  },
-  playIcon: {
-    marginLeft: 3,
-  },
-});

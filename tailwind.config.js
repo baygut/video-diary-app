@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   presets: [require('nativewind/preset')],
   theme: {
@@ -16,6 +17,12 @@ module.exports = {
           danger: 'rgb(var(--color-danger) / <alpha-value>)',
           'danger-muted': 'rgb(var(--color-danger-muted) / <alpha-value>)',
           video: 'rgb(var(--color-video-surface) / <alpha-value>)',
+          overlay: 'rgb(var(--color-overlay) / <alpha-value>)',
+          play: 'rgb(var(--color-play) / <alpha-value>)',
+          'on-play': 'rgb(var(--color-on-play) / <alpha-value>)',
+          'on-dark': 'rgb(var(--color-on-dark) / <alpha-value>)',
+          'icon-muted': 'rgb(var(--color-icon-muted) / <alpha-value>)',
+          'handle-border': 'rgb(var(--color-handle-border) / <alpha-value>)',
         },
       },
     },

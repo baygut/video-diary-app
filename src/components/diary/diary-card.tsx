@@ -4,7 +4,7 @@ import { Alert, Image, Pressable, View } from "react-native";
 
 import type { Diary } from "@/api";
 import { ThemedText } from "@/components/themed-text";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useTheme } from "@/hooks/use-theme";
 import { cn } from "@/utils/cn";
 
 type DiaryCardProps = {
@@ -31,7 +31,7 @@ export function DiaryCard({
   onOpen,
 }: DiaryCardProps) {
   const { t } = useTranslation();
-  const colorScheme = useColorScheme();
+  const theme = useTheme();
 
   function confirmDelete() {
     Alert.alert(
@@ -89,7 +89,7 @@ export function DiaryCard({
             }}
           >
             <Ionicons
-              color={colorScheme === "dark" ? "#F87171" : "#DC2626"}
+              color={theme.danger}
               name="trash-outline"
               size={18}
             />

@@ -7,6 +7,7 @@ import { VideoPlayerView } from '@/components/diary/video-player-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useDiary } from '@/hooks/queries';
+import { useTheme } from '@/hooks/use-theme';
 
 function formatEntryDate(value: string) {
   return new Intl.DateTimeFormat(undefined, {
@@ -17,6 +18,7 @@ function formatEntryDate(value: string) {
 
 export function DiaryDetailScreen() {
   const { t } = useTranslation();
+  const theme = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { data: diary, isError, isPending } = useDiary(id ?? '');
@@ -34,7 +36,7 @@ export function DiaryDetailScreen() {
                   className="h-10 w-10 items-center justify-center"
                   onPress={() => router.push(`/diary/${diary.id}/edit`)}
                 >
-                  <Ionicons color="#0F766E" name="create-outline" size={24} />
+                  <Ionicons color={theme.accent} name="create-outline" size={24} />
                 </Pressable>
               )
             : undefined,
