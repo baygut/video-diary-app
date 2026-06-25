@@ -79,6 +79,26 @@ export function generateOpenApiSpec() {
     },
   });
 
+  registry.registerPath({
+    method: 'delete',
+    path: '/diary/{id}',
+    summary: 'Delete a diary entry and its upload',
+    request: {
+      params: z.object({ id: z.string().uuid() }),
+    },
+    responses: {
+      200: {
+        description: 'Diary entry deleted',
+        content: {
+          'application/json': {
+            schema: z.object({ id: z.string().uuid() }),
+          },
+        },
+      },
+      404: { description: 'Not found' },
+    },
+  });
+
   const generator = new OpenApiGeneratorV3(registry.definitions);
   return generator.generateDocument({
     openapi: '3.0.0',

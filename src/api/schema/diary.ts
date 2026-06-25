@@ -20,6 +20,8 @@ export const DiarySchema = z
   .object({
     id: z.string().uuid().meta({ examples: ['660e8400-e29b-41d4-a716-446655440001'] }),
     uploadId: z.string().uuid(),
+    uploadUri: z.string(),
+    mimeType: z.string(),
     name: z.string(),
     description: z.string().nullable(),
     createdAt: z.string().datetime(),

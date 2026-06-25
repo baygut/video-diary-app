@@ -1,21 +1,63 @@
 {
   "diary": {
     "title": "My Diary",
+    "subtitle": "Video moments saved on this device.",
     "empty": "Your video diary entries will appear here.",
     "upload": "Upload Video",
+    "newEntry": "New Entry",
+    "selectVideo": "Select a video",
+    "selectVideoHint": "Choose a video, then pick the five-second moment to keep.",
+    "cropVideo": "Crop Video",
+    "cropSegment": "5-second segment",
+    "cropHint": "Tap the scrubber to move the selected five-second window.",
+    "stepLabel": "Step {{current}} of {{total}}",
+    "details": "Details",
     "name": "Entry Name",
+    "nameRequired": "Entry name is required.",
     "description": "Description",
     "namePlaceholder": "e.g. Sunset at the beach",
     "descriptionPlaceholder": "What was this moment about?",
     "nameMaxLength": "Max 50 characters",
     "descriptionMaxLength": "Max 200 characters",
-    "save": "Save Entry"
+    "save": "Save Entry",
+    "saving": "Saving...",
+    "uploading": "Uploading video...",
+    "preparingVideo": "Preparing video...",
+    "previewError": "The selected video could not be prepared for preview.",
+    "saveError": "The entry could not be saved.",
+    "deleteError": "The entry could not be deleted.",
+    "permissionTitle": "Permission required",
+    "permissionMessage": "Media library access is required to add a video."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Appearance and language preferences.",
+    "theme": "Theme",
+    "language": "Language",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark",
+    "english": "English",
+    "turkish": "Turkish"
+  },
+  "tabs": {
+    "diary": "Diary",
+    "settings": "Settings"
   },
   "common": {
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
     "error": "Something went wrong",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "next": "Next",
+    "back": "Back",
+    "view": "View"
+  },
+  "screens": {
+    "diary": {
+      "title": "Diary",
+      "detailTitle": "Diary Entry"
+    }
   }
 }

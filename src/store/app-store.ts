@@ -6,11 +6,13 @@ type AppState = {
   colorSchemePreference: 'system' | 'light' | 'dark';
   diaryListSortOrder: 'newest' | 'oldest';
   hasCompletedOnboarding: boolean;
+  languagePreference: 'system' | 'en' | 'tr';
 };
 
 type AppActions = {
   setColorSchemePreference: (pref: AppState['colorSchemePreference']) => void;
   setDiaryListSortOrder: (order: AppState['diaryListSortOrder']) => void;
+  setLanguagePreference: (pref: AppState['languagePreference']) => void;
   completeOnboarding: () => void;
   reset: () => void;
 };
@@ -19,6 +21,7 @@ const INITIAL_STATE: AppState = {
   colorSchemePreference: 'system',
   diaryListSortOrder: 'newest',
   hasCompletedOnboarding: false,
+  languagePreference: 'system',
 };
 
 export const useAppStore = create<AppState & AppActions>()(
@@ -27,6 +30,7 @@ export const useAppStore = create<AppState & AppActions>()(
       ...INITIAL_STATE,
       setColorSchemePreference: (colorSchemePreference) => set({ colorSchemePreference }),
       setDiaryListSortOrder: (diaryListSortOrder) => set({ diaryListSortOrder }),
+      setLanguagePreference: (languagePreference) => set({ languagePreference }),
       completeOnboarding: () => set({ hasCompletedOnboarding: true }),
       reset: () => set(INITIAL_STATE),
     }),

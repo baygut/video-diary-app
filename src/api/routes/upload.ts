@@ -1,6 +1,38 @@
+import { Directory, File, Paths } from 'expo-file-system';
+import { Platform } from 'react-native';
+
 import { getDb } from '../db/client';
+import { createId } from '../id';
 import { UploadRequestSchema, UploadResponse } from '../schema';
 import { ApiResponse, ok, err } from '../types';
+
+const MIME_EXTENSIONS: Record<string, string> = {
+  'video/mp4': 'mp4',
+  'video/quicktime': 'mov',
+  'video/x-m4v': 'm4v',
+  'video/webm': 'webm',
+};
+
+function getVideoExtension(uri: string, mimeType: string): string {
+  const cleanUri = uri.split('?')[0]?.split('#')[0] ?? uri;
+  const uriExtension = cleanUri.match(/\.([a-zA-Z0-9]+)$/)?.[1];
+  return (uriExtension ?? MIME_EXTENSIONS[mimeType] ?? 'mp4').toLowerCase();
+}
+
+async function persistVideo(uri: string, mimeType: string, id: string): Promise<string> {
+  if (Platform.OS === 'web') {
+    return uri;
+  }
+
+  const uploadsDirectory = new Directory(Paths.document, 'uploads');
+  uploadsDirectory.create({ intermediates: true, idempotent: true });
+
+  const source = new File(uri);
+  const destination = new File(uploadsDirectory, `${id}.${getVideoExtension(uri, mimeType)}`);
+  await source.copy(destination, { overwrite: true });
+
+  return destination.uri;
+}
 
 export async function postUpload(input: unknown): Promise<ApiResponse<UploadResponse>> {
   const parsed = UploadRequestSchema.safeParse(input);
@@ -9,16 +41,17 @@ export async function postUpload(input: unknown): Promise<ApiResponse<UploadResp
   }
 
   const { uri, mimeType } = parsed.data;
-  const id = crypto.randomUUID();
+  const id = createId();
   const createdAt = new Date().toISOString();
 
   try {
+    const persistedUri = await persistVideo(uri, mimeType, id);
     const db = await getDb();
     await db.runAsync(
       `INSERT INTO uploads (id, uri, mime_type, created_at) VALUES (?, ?, ?, ?)`,
-      [id, uri, mimeType, createdAt]
+      [id, persistedUri, mimeType, createdAt]
     );
-    return ok({ id, uri, mimeType, createdAt }, 201);
+    return ok({ id, uri: persistedUri, mimeType, createdAt }, 201);
   } catch (e) {
     return err(e instanceof Error ? e.message : 'Database error', 500);
   }

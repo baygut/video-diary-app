@@ -88,6 +88,12 @@
             "type": "string",
             "format": "uuid"
           },
+          "uploadUri": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
           "name": {
             "type": "string"
           },
@@ -107,6 +113,8 @@
         "required": [
           "id",
           "uploadId",
+          "uploadUri",
+          "mimeType",
           "name",
           "description",
           "createdAt",
@@ -251,6 +259,44 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Diary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a diary entry and its upload",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "required": true,
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Diary entry deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ]
                 }
               }
             }

@@ -1,4 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
+  --color-background: 255 255 255;
+  --color-background-element: 240 240 243;
+  --color-background-selected: 224 225 230;
+  --color-text: 0 0 0;
+  --color-text-secondary: 96 100 108;
   --font-display:
     Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
     Segoe UI Symbol, Noto Color Emoji;
@@ -6,4 +15,12 @@
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
   --font-rounded: 'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif;
   --font-serif: Georgia, 'Times New Roman', serif;
+}
+
+.dark {
+  --color-background: 0 0 0;
+  --color-background-element: 33 34 37;
+  --color-background-selected: 46 49 53;
+  --color-text: 255 255 255;
+  --color-text-secondary: 176 180 186;
 }

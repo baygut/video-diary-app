@@ -1,0 +1,63 @@
+{
+  "diary": {
+    "title": "Günlüğüm",
+    "subtitle": "Bu cihazda saklanan video anları.",
+    "empty": "Video günlük kayıtların burada görünecek.",
+    "upload": "Video Yükle",
+    "newEntry": "Yeni Kayıt",
+    "selectVideo": "Video seç",
+    "selectVideoHint": "Bir video seç, sonra saklanacak beş saniyelik anı belirle.",
+    "cropVideo": "Videoyu Kırp",
+    "cropSegment": "5 saniyelik bölüm",
+    "cropHint": "Seçili beş saniyelik aralığı taşımak için çubuğa dokun.",
+    "stepLabel": "Adım {{current}} / {{total}}",
+    "details": "Detaylar",
+    "name": "Kayıt Adı",
+    "nameRequired": "Kayıt adı gerekli.",
+    "description": "Açıklama",
+    "namePlaceholder": "Örn. Sahilde gün batımı",
+    "descriptionPlaceholder": "Bu an ne hakkındaydı?",
+    "nameMaxLength": "En fazla 50 karakter",
+    "descriptionMaxLength": "En fazla 200 karakter",
+    "save": "Kaydı Kaydet",
+    "saving": "Kaydediliyor...",
+    "uploading": "Video yükleniyor...",
+    "preparingVideo": "Video hazırlanıyor...",
+    "previewError": "Seçilen video önizleme için hazırlanamadı.",
+    "saveError": "Kayıt kaydedilemedi.",
+    "deleteError": "Kayıt silinemedi.",
+    "permissionTitle": "İzin gerekli",
+    "permissionMessage": "Video eklemek için medya arşivi erişimi gerekiyor."
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "subtitle": "Görünüm ve dil tercihleri.",
+    "theme": "Tema",
+    "language": "Dil",
+    "system": "Sistem",
+    "light": "Açık",
+    "dark": "Koyu",
+    "english": "İngilizce",
+    "turkish": "Türkçe"
+  },
+  "tabs": {
+    "diary": "Günlük",
+    "settings": "Ayarlar"
+  },
+  "common": {
+    "cancel": "İptal",
+    "save": "Kaydet",
+    "delete": "Sil",
+    "error": "Bir şeyler ters gitti",
+    "loading": "Yükleniyor...",
+    "next": "İleri",
+    "back": "Geri",
+    "view": "Görüntüle"
+  },
+  "screens": {
+    "diary": {
+      "title": "Günlük",
+      "detailTitle": "Günlük Kaydı"
+    }
+  }
+}
