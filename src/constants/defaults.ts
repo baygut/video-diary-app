@@ -1,0 +1,1 @@
+export const DEFAULT_SEGMENT_SECONDS = 5;

@@ -1,11 +1,11 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import { Pressable, View } from "react-native";
+import { Alert, Image, Pressable, View } from "react-native";
 
 import type { Diary } from "@/api";
-import { AppButton } from "@/components/app-button";
 import { ThemedText } from "@/components/themed-text";
-
-import { VideoPlayerView } from "./video-player-view";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { cn } from "@/utils/cn";
 
 type DiaryCardProps = {
   entry: Diary;
@@ -31,15 +31,46 @@ export function DiaryCard({
   onOpen,
 }: DiaryCardProps) {
   const { t } = useTranslation();
+  const colorScheme = useColorScheme();
+
+  function confirmDelete() {
+    Alert.alert(
+      t("diary.deleteConfirmTitle"),
+      t("diary.deleteConfirmMessage"),
+      [
+        { text: t("common.cancel"), style: "cancel" },
+        {
+          text: t("common.delete"),
+          style: "destructive",
+          onPress: () => onDelete(entry.id),
+        },
+      ],
+    );
+  }
 
   return (
-    <Pressable className="overflow-hidden rounded-lg bg-app-element">
-      <VideoPlayerView uri={entry.uploadUri} />
+    <Pressable
+      className={cn(
+        "overflow-hidden rounded-2xl border border-app-selected bg-app-element",
+        isDeleting && "opacity-60",
+      )}
+      disabled={isDeleting}
+      onPress={() => onOpen?.(entry.id)}
+    >
+      <Image
+        source={{ uri: entry.thumbnailUri }}
+        className="h-48 w-full"
+        resizeMode="cover"
+      />
 
       <View className="gap-2 p-4">
-        <View className="flex-row items-start justify-between gap-4">
+        <View className="flex-row items-start gap-3">
           <View className="flex-1 gap-1">
-            <ThemedText type="default" numberOfLines={2} className="shrink">
+            <ThemedText
+              type="default"
+              numberOfLines={2}
+              className="font-semibold"
+            >
               {entry.name}
             </ThemedText>
             <ThemedText type="small" themeColor="textSecondary">
@@ -47,28 +78,26 @@ export function DiaryCard({
             </ThemedText>
           </View>
 
-          <AppButton
-            variant="secondary"
-            label={t("common.view")}
-            onPress={() => {
-              onOpen?.(entry.id);
-            }}
-          />
-
-          <AppButton
-            variant="danger"
-            label={isDeleting ? t("common.loading") : t("common.delete")}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t("common.delete")}
+            className="h-9 w-9 items-center justify-center rounded-full bg-app-danger-muted"
+            disabled={isDeleting}
             onPress={(event) => {
               event.stopPropagation();
-              onDelete(entry.id);
+              confirmDelete();
             }}
-            disabled={isDeleting}
-            className="min-h-9"
-          />
+          >
+            <Ionicons
+              color={colorScheme === "dark" ? "#F87171" : "#DC2626"}
+              name="trash-outline"
+              size={18}
+            />
+          </Pressable>
         </View>
 
         {entry.description ? (
-          <ThemedText themeColor="textSecondary" className="shrink">
+          <ThemedText themeColor="textSecondary" numberOfLines={2}>
             {entry.description}
           </ThemedText>
         ) : null}

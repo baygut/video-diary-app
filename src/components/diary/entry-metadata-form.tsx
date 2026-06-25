@@ -18,40 +18,58 @@ export type EntryMetadataValues = z.infer<typeof EntryMetadataSchema>;
 
 type EntryMetadataFormProps = {
   disabled?: boolean;
-  hasSelectedVideo: boolean;
+  initialValues?: EntryMetadataValues;
   isSaving: boolean;
   onSubmit: (values: EntryMetadataValues) => void;
-  visible: boolean;
+  ready?: boolean;
+  requireDirty?: boolean;
+  saveLabel?: string;
+  savingLabel?: string;
+  visible?: boolean;
 };
+
+const EMPTY_VALUES: EntryMetadataValues = { name: '', description: '' };
 
 export function EntryMetadataForm({
   disabled,
-  hasSelectedVideo,
+  initialValues = EMPTY_VALUES,
   isSaving,
   onSubmit,
-  visible,
+  ready = true,
+  requireDirty,
+  saveLabel,
+  savingLabel,
+  visible = true,
 }: EntryMetadataFormProps) {
   const { t } = useTranslation();
   const theme = useTheme();
   const {
     control,
-    formState: { errors, isValid },
+    formState: { errors, isDirty, isValid },
     handleSubmit,
     reset,
   } = useForm<EntryMetadataValues>({
-    defaultValues: { name: '', description: '' },
+    defaultValues: initialValues,
     mode: 'onChange',
     resolver: zodResolver(EntryMetadataSchema),
   });
   const name = useWatch({ control, name: 'name' }) ?? '';
   const description = useWatch({ control, name: 'description' }) ?? '';
-  const canSubmit = hasSelectedVideo && isValid && !disabled && !isSaving;
+  const canSubmit =
+    ready &&
+    isValid &&
+    !disabled &&
+    !isSaving &&
+    (!requireDirty || isDirty);
 
   useEffect(() => {
     if (!visible) {
-      reset({ name: '', description: '' });
+      reset(EMPTY_VALUES);
+      return;
     }
-  }, [reset, visible]);
+
+    reset(initialValues);
+  }, [initialValues, reset, visible]);
 
   return (
     <View className="gap-4">
@@ -113,7 +131,7 @@ export function EntryMetadataForm({
       </View>
 
       <AppButton
-        label={isSaving ? t('diary.saving') : t('diary.save')}
+        label={isSaving ? savingLabel ?? t('diary.saving') : saveLabel ?? t('diary.save')}
         loading={isSaving}
         disabled={!canSubmit}
         onPress={handleSubmit(onSubmit)}

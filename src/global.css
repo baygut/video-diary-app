@@ -8,6 +8,11 @@
   --color-background-selected: 224 225 230;
   --color-text: 0 0 0;
   --color-text-secondary: 96 100 108;
+  --color-accent: 15 118 110;
+  --color-accent-muted: 204 251 241;
+  --color-danger: 220 38 38;
+  --color-danger-muted: 254 226 226;
+  --color-video-surface: 9 9 11;
   --font-display:
     Spline Sans, Inter, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji,
     Segoe UI Symbol, Noto Color Emoji;
@@ -23,4 +28,9 @@
   --color-background-selected: 46 49 53;
   --color-text: 255 255 255;
   --color-text-secondary: 176 180 186;
+  --color-accent: 45 212 191;
+  --color-accent-muted: 19 78 74;
+  --color-danger: 248 113 113;
+  --color-danger-muted: 69 10 10;
+  --color-video-surface: 9 9 11;
 }

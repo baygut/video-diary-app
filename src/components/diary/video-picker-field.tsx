@@ -1,5 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import { Pressable } from "react-native";
+import { Pressable, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { cn } from "@/utils/cn";
@@ -23,8 +24,9 @@ export function VideoPickerField({
   return (
     <Pressable
       className={cn(
-        "min-h-[220px] items-center justify-center overflow-hidden rounded-lg bg-app-element",
-        selectedVideo && "mb-1 min-h-[260px]",
+        "min-h-[240px] items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-app-selected bg-app-element",
+        selectedVideo && "border-solid",
+        disabled && "opacity-60",
       )}
       onPress={onPress}
       disabled={disabled}
@@ -32,9 +34,15 @@ export function VideoPickerField({
       {selectedVideo ? (
         <VideoPlayerView variant="preview" uri={selectedVideo.uri} />
       ) : (
-        <ThemedText themeColor="textSecondary">
-          {t("diary.selectVideo")}
-        </ThemedText>
+        <View className="items-center gap-3 px-6 py-10">
+          <View className="h-16 w-16 items-center justify-center rounded-full bg-app-accent-muted">
+            <Ionicons color="#0F766E" name="videocam-outline" size={28} />
+          </View>
+          <ThemedText type="smallBold">{t("diary.selectVideo")}</ThemedText>
+          <ThemedText themeColor="textSecondary" type="small" className="text-center">
+            {t("diary.selectVideoHint")}
+          </ThemedText>
+        </View>
       )}
     </Pressable>
   );

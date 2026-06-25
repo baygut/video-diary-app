@@ -4,6 +4,7 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import { useColorScheme as useNativeWindColorScheme } from "nativewind";
 import { useEffect } from "react";
 import { AppState } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import i18n from "@/i18n";
@@ -49,19 +50,28 @@ export default function TabLayout() {
   const { t } = useTranslation();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen options={{ headerShown: false }} name="(tabs)" />
-          <Stack.Screen
-            name="diary/[id]"
-            options={{
-              title: t("screens.diary.detailTitle"),
-              headerBackTitle: t("tabs.diary"), // iOS back text
-            }}
-          />
-        </Stack>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+          <Stack>
+            <Stack.Screen options={{ headerShown: false }} name="(tabs)" />
+            <Stack.Screen
+              name="diary/[id]/index"
+              options={{
+                title: t("screens.diary.detailTitle"),
+                headerBackTitle: t("tabs.diary"), // iOS back text
+              }}
+            />
+            <Stack.Screen
+              name="diary/[id]/edit"
+              options={{
+                title: t("diary.editEntry"),
+                headerBackTitle: t("screens.diary.detailTitle"),
+              }}
+            />
+          </Stack>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }

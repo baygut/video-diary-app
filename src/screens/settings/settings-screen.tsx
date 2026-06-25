@@ -33,7 +33,7 @@ function SegmentedSetting<T extends string>({
   return (
     <View className="gap-2">
       <ThemedText type="smallBold">{label}</ThemedText>
-      <View className="flex-row gap-1 rounded-lg bg-app-element p-1">
+      <View className="flex-row gap-1 rounded-xl bg-app-element p-1">
         {options.map((option) => {
           const isSelected = option.value === value;
 
@@ -80,7 +80,7 @@ export function SettingsScreen() {
   }
 
   return (
-    <AppScreen>
+    <AppScreen title={t("settings.title")} subtitle={t("settings.subtitle")}>
       <View className="gap-6">
         <SegmentedSetting
           label={t("settings.theme")}

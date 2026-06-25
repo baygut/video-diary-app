@@ -1,14 +1,15 @@
-import { ActivityIndicator, Pressable, type PressableProps } from 'react-native';
+import { ActivityIndicator, Pressable, type PressableProps } from "react-native";
 
-import { ThemedText } from '@/components/themed-text';
-import { cn } from '@/utils/cn';
+import { ThemedText } from "@/components/themed-text";
+import { cn } from "@/utils/cn";
 
-type AppButtonProps = Omit<PressableProps, 'children'> & {
+type AppButtonProps = Omit<PressableProps, "children"> & {
   className?: string;
   label: string;
   loading?: boolean;
+  size?: "default" | "compact";
   textClassName?: string;
-  variant?: 'primary' | 'secondary' | 'danger' | 'segment';
+  variant?: "primary" | "secondary" | "danger" | "ghost";
 };
 
 export function AppButton({
@@ -16,8 +17,9 @@ export function AppButton({
   disabled,
   label,
   loading,
+  size = "default",
   textClassName,
-  variant = 'primary',
+  variant = "primary",
   ...props
 }: AppButtonProps) {
   const isDisabled = disabled || loading;
@@ -25,28 +27,36 @@ export function AppButton({
   return (
     <Pressable
       className={cn(
-        'min-h-11 items-center justify-center rounded-lg px-4',
-        variant === 'primary' && 'bg-teal-700',
-        variant === 'secondary' && 'bg-transparent',
-        variant === 'danger' && 'bg-red-100',
-        variant === 'segment' && 'flex-1 bg-transparent',
-        isDisabled && 'opacity-45',
-        className
+        "items-center justify-center rounded-xl border",
+        size === "default" ? "min-h-11 px-4" : "min-h-9 px-3",
+        variant === "primary" && "border-app-accent bg-app-accent",
+        variant === "secondary" &&
+          "border-app-selected bg-app-element",
+        variant === "danger" && "border-app-danger-muted bg-app-danger-muted",
+        variant === "ghost" && "border-transparent bg-transparent",
+        isDisabled && "opacity-45",
+        className,
       )}
       disabled={isDisabled}
       {...props}
     >
       {({ pressed }) => (
         <>
-          {loading ? <ActivityIndicator color="#FFFFFF" /> : null}
+          {loading ? (
+            <ActivityIndicator
+              color={variant === "primary" ? "#FFFFFF" : undefined}
+            />
+          ) : null}
           {!loading ? (
             <ThemedText
               type="smallBold"
               className={cn(
-                pressed && 'opacity-70',
-                variant === 'primary' && 'text-white',
-                variant === 'danger' && 'text-red-800',
-                textClassName
+                pressed && "opacity-70",
+                variant === "primary" && "text-white",
+                variant === "secondary" && "text-app-text",
+                variant === "danger" && "text-app-danger",
+                variant === "ghost" && "text-app-accent",
+                textClassName,
               )}
             >
               {label}

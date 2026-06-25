@@ -1,10 +1,16 @@
+import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Alert, FlatList, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  FlatList,
+  Pressable,
+  View,
+} from "react-native";
 
-import { AppButton } from "@/components/app-button";
 import { AppScreen } from "@/components/app-screen";
 import { DiaryCard } from "@/components/diary/diary-card";
 import type { EntryMetadataValues } from "@/components/diary/entry-metadata-form";
@@ -12,8 +18,8 @@ import {
   type EntryFlowStep,
   NewEntryModal,
 } from "@/components/diary/new-entry-modal";
-import { SEGMENT_SECONDS } from "@/components/diary/video-trim-step";
 import { ThemedText } from "@/components/themed-text";
+import { DEFAULT_SEGMENT_SECONDS } from "@/constants/defaults";
 import {
   useCreateDiary,
   useDeleteDiary,
@@ -21,6 +27,7 @@ import {
   useTrimVideo,
   useUploadVideo,
 } from "@/hooks/queries";
+import { useAppStore } from "@/store/app-store";
 import { debugLog } from "@/utils/debug-log";
 import {
   createPreviewVideo,
@@ -39,6 +46,7 @@ function waitForUiFrame() {
 export function DiaryScreen() {
   const { t } = useTranslation();
   const router = useRouter();
+  const sortOrder = useAppStore((state) => state.diaryListSortOrder);
   const { data: diaries, isPending, isError } = useDiaries();
   const uploadVideo = useUploadVideo();
   const trimVideo = useTrimVideo();
@@ -51,13 +59,26 @@ export function DiaryScreen() {
   );
   const [step, setStep] = useState<EntryFlowStep>("select");
   const [trimStart, setTrimStart] = useState(0);
+  const [segmentSeconds, setSegmentSeconds] = useState(DEFAULT_SEGMENT_SECONDS);
   const [isPreparingVideo, setPreparingVideo] = useState(false);
+
+  const sortedDiaries = useMemo(() => {
+    if (!diaries) return [];
+    return [...diaries].sort((left, right) => {
+      const leftTime = new Date(left.createdAt).getTime();
+      const rightTime = new Date(right.createdAt).getTime();
+      return sortOrder === "newest"
+        ? rightTime - leftTime
+        : leftTime - rightTime;
+    });
+  }, [diaries, sortOrder]);
 
   const isSaving =
     trimVideo.isPending || uploadVideo.isPending || createDiary.isPending;
 
   function openModal() {
     setStep("select");
+    setSegmentSeconds(DEFAULT_SEGMENT_SECONDS);
     setModalVisible(true);
   }
 
@@ -68,6 +89,7 @@ export function DiaryScreen() {
     setSelectedVideo(null);
     setStep("select");
     setTrimStart(0);
+    setSegmentSeconds(DEFAULT_SEGMENT_SECONDS);
     setPreparingVideo(false);
     trimVideo.reset();
     uploadVideo.reset();
@@ -107,6 +129,12 @@ export function DiaryScreen() {
         debugLog("selection.ready", previewVideo);
         setSelectedVideo(previewVideo);
         setTrimStart(0);
+        setSegmentSeconds(
+          Math.min(
+            DEFAULT_SEGMENT_SECONDS,
+            Math.max(1, Math.floor(previewVideo.durationSeconds)),
+          ),
+        );
         deleteLocalPreview(previousVideo);
       } catch (error) {
         Alert.alert(
@@ -129,7 +157,7 @@ export function DiaryScreen() {
       const trimmed = await trimVideo.mutateAsync({
         uri: selectedVideo.uri,
         startTime: trimStart,
-        endTime: trimStart + SEGMENT_SECONDS,
+        endTime: trimStart + segmentSeconds,
       });
       trimmedUri = trimmed.uri;
 
@@ -167,24 +195,23 @@ export function DiaryScreen() {
   }
 
   return (
-    <AppScreen
-      title={t("diary.title")}
-      subtitle={t("diary.subtitle")}
-      actions={<AppButton label={t("diary.upload")} onPress={openModal} />}
-    >
+    <AppScreen title={t("diary.title")} subtitle={t("diary.subtitle")}>
       <FlatList
         className="flex-1"
-        contentContainerClassName="gap-4 pb-4"
-        data={diaries ?? []}
+        contentContainerClassName="gap-4 pb-28"
+        data={sortedDiaries}
         keyExtractor={(item) => item.id}
         ListEmptyComponent={
-          <View className="min-h-[220px] items-center justify-center">
+          <View className="min-h-[280px] items-center justify-center gap-3 rounded-2xl border border-dashed border-app-selected bg-app-element px-6">
             {isPending ? (
               <ActivityIndicator />
             ) : (
-              <ThemedText themeColor="textSecondary" className="text-center">
-                {isError ? t("common.error") : t("diary.empty")}
-              </ThemedText>
+              <>
+                <Ionicons color="#60646C" name="film-outline" size={40} />
+                <ThemedText themeColor="textSecondary" className="text-center">
+                  {isError ? t("common.error") : t("diary.empty")}
+                </ThemedText>
+              </>
             )}
           </View>
         }
@@ -202,6 +229,15 @@ export function DiaryScreen() {
         )}
       />
 
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t("diary.newEntry")}
+        className="absolute bottom-8 right-6 h-14 w-14 items-center justify-center rounded-full bg-app-accent shadow-lg"
+        onPress={openModal}
+      >
+        <Ionicons color="#FFFFFF" name="add" size={28} />
+      </Pressable>
+
       <NewEntryModal
         visible={isModalVisible}
         selectedVideo={selectedVideo}
@@ -209,9 +245,11 @@ export function DiaryScreen() {
         isSaving={isSaving}
         step={step}
         trimStart={trimStart}
+        segmentSeconds={segmentSeconds}
         onCancel={closeModal}
         onBackToTrim={() => setStep("trim")}
         onChangeTrimStart={setTrimStart}
+        onChangeSegmentSeconds={setSegmentSeconds}
         onContinueToMetadata={() => setStep("metadata")}
         onPickVideo={pickVideo}
         onSubmit={saveEntry}

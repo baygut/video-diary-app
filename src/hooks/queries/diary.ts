@@ -1,7 +1,13 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import { deleteDiaryById, getDiaryById, getDiaryList, postDiary } from '@/api';
-import type { DiaryCreateRequest } from '@/api';
+import {
+  deleteDiaryById,
+  getDiaryById,
+  getDiaryList,
+  postDiary,
+  updateDiaryById,
+} from '@/api';
+import type { DiaryCreateRequest, DiaryUpdateRequest } from '@/api';
 
 export const diaryQueryOptions = {
   list: () =>
@@ -43,6 +49,27 @@ export function useCreateDiary() {
       return result.data;
     },
     onSuccess: () => {
+      client.invalidateQueries({ queryKey: ['/diary'] });
+    },
+  });
+}
+
+export function useUpdateDiary() {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      id,
+      values,
+    }: {
+      id: string;
+      values: DiaryUpdateRequest;
+    }) => {
+      const result = await updateDiaryById(id, values);
+      if (!result.ok) throw new Error(result.error);
+      return result.data;
+    },
+    onSuccess: (data) => {
+      client.setQueryData(['/diary', data.id], data);
       client.invalidateQueries({ queryKey: ['/diary'] });
     },
   });
