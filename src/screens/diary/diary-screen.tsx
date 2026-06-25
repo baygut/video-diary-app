@@ -63,6 +63,7 @@ export function DiaryScreen() {
   const [trimStart, setTrimStart] = useState(0);
   const [segmentSeconds, setSegmentSeconds] = useState(DEFAULT_SEGMENT_SECONDS);
   const [isPreparingVideo, setPreparingVideo] = useState(false);
+  const [saveProgress, setSaveProgress] = useState(0);
 
   const sortedDiaries = useMemo(() => {
     if (!diaries) return [];
@@ -93,6 +94,7 @@ export function DiaryScreen() {
     setTrimStart(0);
     setSegmentSeconds(DEFAULT_SEGMENT_SECONDS);
     setPreparingVideo(false);
+    setSaveProgress(0);
     trimVideo.reset();
     uploadVideo.reset();
     createDiary.reset();
@@ -156,22 +158,26 @@ export function DiaryScreen() {
     let trimmedUri: string | null = null;
 
     try {
+      setSaveProgress(0.08);
       const trimmed = await trimVideo.mutateAsync({
         uri: selectedVideo.uri,
         startTime: trimStart,
         endTime: trimStart + segmentSeconds,
       });
       trimmedUri = trimmed.uri;
+      setSaveProgress(0.38);
 
       const upload = await uploadVideo.mutateAsync({
         uri: trimmed.uri,
         mimeType: selectedVideo.mimeType,
       });
+      setSaveProgress(0.78);
       await createDiary.mutateAsync({
         uploadId: upload.id,
         name: values.name,
         description: values.description || undefined,
       });
+      setSaveProgress(1);
       deleteLocalPreview(selectedVideo);
       setModalVisible(false);
       resetForm();
@@ -182,6 +188,7 @@ export function DiaryScreen() {
       );
     } finally {
       deleteLocalFile(trimmedUri);
+      setSaveProgress(0);
     }
   }
 
@@ -254,6 +261,7 @@ export function DiaryScreen() {
         onChangeSegmentSeconds={setSegmentSeconds}
         onContinueToMetadata={() => setStep("metadata")}
         onPickVideo={pickVideo}
+        saveProgress={saveProgress}
         onSubmit={saveEntry}
       />
     </AppScreen>

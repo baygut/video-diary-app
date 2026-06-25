@@ -1,8 +1,13 @@
-import { ActivityIndicator, Pressable, type PressableProps } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  type PressableProps,
+} from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { useTheme } from "@/hooks/use-theme";
 import { cn } from "@/utils/cn";
+import * as Haptics from "expo-haptics";
 
 type AppButtonProps = Omit<PressableProps, "children"> & {
   className?: string;
@@ -11,6 +16,13 @@ type AppButtonProps = Omit<PressableProps, "children"> & {
   size?: "default" | "compact";
   textClassName?: string;
   variant?: "primary" | "secondary" | "danger" | "ghost";
+  hapticType?:
+    | "impactLight"
+    | "impactMedium"
+    | "impactHeavy"
+    | "notificationSuccess"
+    | "notificationWarning"
+    | "notificationError";
 };
 
 export function AppButton({
@@ -21,19 +33,46 @@ export function AppButton({
   size = "default",
   textClassName,
   variant = "primary",
+  hapticType = "impactLight",
   ...props
 }: AppButtonProps) {
   const theme = useTheme();
   const isDisabled = disabled || loading;
 
+  const handlePressIn: PressableProps["onPressIn"] = (event) => {
+    if (hapticType) {
+      switch (hapticType) {
+        case "impactLight":
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          break;
+        case "impactMedium":
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          break;
+        case "impactHeavy":
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+          break;
+        case "notificationSuccess":
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          break;
+        case "notificationWarning":
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+          break;
+        case "notificationError":
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          break;
+      }
+    }
+    props.onPressIn?.(event);
+  };
+
   return (
     <Pressable
+      onPressIn={handlePressIn}
       className={cn(
         "items-center justify-center rounded-xl border",
         size === "default" ? "min-h-11 px-4" : "min-h-9 px-3",
         variant === "primary" && "border-app-accent bg-app-accent",
-        variant === "secondary" &&
-          "border-app-selected bg-app-element",
+        variant === "secondary" && "border-app-selected bg-app-element",
         variant === "danger" && "border-app-danger-muted bg-app-danger-muted",
         variant === "ghost" && "border-transparent bg-transparent",
         isDisabled && "opacity-45",

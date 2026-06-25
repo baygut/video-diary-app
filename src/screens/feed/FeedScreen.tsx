@@ -27,7 +27,7 @@ export function FeedScreen() {
   const { data: diaries, isError, isPending } = useDiaries();
   const [activeId, setActiveId] = useState<string | null>(null);
   const isFocused = useIsFocused();
-  const itemHeight = Math.max(320, height - insets.bottom);
+  const itemHeight = Math.max(320, height);
 
   const feedItems = useMemo(() => {
     if (!diaries) return [];

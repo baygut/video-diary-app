@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/immutability */
+import * as Haptics from "expo-haptics";
 import { useEffect } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   runOnJS,
@@ -30,6 +31,47 @@ function formatTimeLabel(totalSeconds: number) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+function triggerHaptic(effect: Promise<void>) {
+  effect.catch(() => {
+    // Haptics are best-effort and can be unavailable due to device settings.
+  });
+}
+
+function triggerSlideStartHaptic() {
+  if (Platform.OS === "android") {
+    triggerHaptic(
+      Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Gesture_Start),
+    );
+    return;
+  }
+
+  triggerHaptic(Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light));
+}
+
+function triggerSlideTickHaptic() {
+  if (Platform.OS === "android") {
+    triggerHaptic(
+      Haptics.performAndroidHapticsAsync(
+        Haptics.AndroidHaptics.Segment_Frequent_Tick,
+      ),
+    );
+    return;
+  }
+
+  triggerHaptic(Haptics.selectionAsync());
+}
+
+function triggerSlideEndHaptic() {
+  if (Platform.OS === "android") {
+    triggerHaptic(
+      Haptics.performAndroidHapticsAsync(Haptics.AndroidHaptics.Gesture_End),
+    );
+    return;
+  }
+
+  triggerHaptic(Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft));
+}
+
 export function VideoSegmentRangeTrimmer({
   disabled,
   durationSeconds,
@@ -56,6 +98,7 @@ export function VideoSegmentRangeTrimmer({
   const startLeft = useSharedValue(0);
   const startWidth = useSharedValue(0);
   const startPlayhead = useSharedValue(0);
+  const lastHapticSecond = useSharedValue(-1);
   const trackWidthSV = useSharedValue(0);
 
   useEffect(() => {
@@ -94,6 +137,8 @@ export function VideoSegmentRangeTrimmer({
       "worklet";
       startLeft.value = leftPct.value;
       startWidth.value = widthPct.value;
+      lastHapticSecond.value = Math.round(leftPct.value * dur);
+      runOnJS(triggerSlideStartHaptic)();
     })
     .onUpdate(({ translationX }) => {
       "worklet";
@@ -111,8 +156,17 @@ export function VideoSegmentRangeTrimmer({
       leftPct.value = next;
       widthPct.value = nextWidth;
       playheadPct.value = Math.min(Math.max(playheadPct.value, next), right);
-      runOnJS(onChangeStart)(Math.round(next * dur));
+      const nextStartSecond = Math.round(next * dur);
+      if (nextStartSecond !== lastHapticSecond.value) {
+        lastHapticSecond.value = nextStartSecond;
+        runOnJS(triggerSlideTickHaptic)();
+      }
+      runOnJS(onChangeStart)(nextStartSecond);
       runOnJS(onChangeSegmentSeconds)(Math.round(nextWidth * dur));
+    })
+    .onFinalize(() => {
+      "worklet";
+      runOnJS(triggerSlideEndHaptic)();
     });
 
   const rightGesture = Gesture.Pan()
@@ -121,6 +175,8 @@ export function VideoSegmentRangeTrimmer({
     .onBegin(() => {
       "worklet";
       startWidth.value = widthPct.value;
+      lastHapticSecond.value = Math.round(widthPct.value * dur);
+      runOnJS(triggerSlideStartHaptic)();
     })
     .onUpdate(({ translationX }) => {
       "worklet";
@@ -137,7 +193,16 @@ export function VideoSegmentRangeTrimmer({
         Math.max(playheadPct.value, leftPct.value),
         right,
       );
-      runOnJS(onChangeSegmentSeconds)(Math.round(next * dur));
+      const nextSegmentSecond = Math.round(next * dur);
+      if (nextSegmentSecond !== lastHapticSecond.value) {
+        lastHapticSecond.value = nextSegmentSecond;
+        runOnJS(triggerSlideTickHaptic)();
+      }
+      runOnJS(onChangeSegmentSeconds)(nextSegmentSecond);
+    })
+    .onFinalize(() => {
+      "worklet";
+      runOnJS(triggerSlideEndHaptic)();
     });
 
   const playheadGesture = Gesture.Pan()
@@ -146,6 +211,8 @@ export function VideoSegmentRangeTrimmer({
     .onBegin(() => {
       "worklet";
       startPlayhead.value = playheadPct.value;
+      lastHapticSecond.value = Math.round(playheadPct.value * dur);
+      runOnJS(triggerSlideStartHaptic)();
     })
     .onUpdate(({ translationX }) => {
       "worklet";
@@ -157,7 +224,16 @@ export function VideoSegmentRangeTrimmer({
       const next = Math.min(Math.max(min, startPlayhead.value + delta), max);
 
       playheadPct.value = next;
+      const nextPlayheadSecond = Math.round(next * dur);
+      if (nextPlayheadSecond !== lastHapticSecond.value) {
+        lastHapticSecond.value = nextPlayheadSecond;
+        runOnJS(triggerSlideTickHaptic)();
+      }
       if (onChangePlayhead) runOnJS(onChangePlayhead)(next * dur);
+    })
+    .onFinalize(() => {
+      "worklet";
+      runOnJS(triggerSlideEndHaptic)();
     });
 
   return (

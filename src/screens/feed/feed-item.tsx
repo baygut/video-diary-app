@@ -3,7 +3,14 @@ import { useEvent } from "expo";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, StyleSheet, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  View,
+  type NativeSyntheticEvent,
+  type TextLayoutEventData,
+} from "react-native";
+import Animated, { LinearTransition } from "react-native-reanimated";
 
 import type { Diary } from "@/api";
 import { ThemedText } from "@/components/themed-text";
@@ -18,11 +25,75 @@ type FeedItemProps = {
   topInset: number;
 };
 
+type FeedDescriptionProps = {
+  description: string;
+};
+
 function formatEntryDate(value: string) {
   return new Intl.DateTimeFormat(undefined, {
     month: "short",
     day: "numeric",
   }).format(new Date(value));
+}
+
+function FeedDescription({ description }: FeedDescriptionProps) {
+  const { t } = useTranslation();
+  const theme = useTheme();
+  const [isExpanded, setExpanded] = useState(false);
+  const [isExpandable, setExpandable] = useState(false);
+  const descriptionTransition = LinearTransition.duration(220);
+
+  function toggleDescription() {
+    if (!isExpandable) return;
+    setExpanded((value) => !value);
+  }
+
+  function handleDescriptionLayout(
+    event: NativeSyntheticEvent<TextLayoutEventData>,
+  ) {
+    const nextIsExpandable = event.nativeEvent.lines.length > 3;
+    setExpandable((value) =>
+      value === nextIsExpandable ? value : nextIsExpandable,
+    );
+  }
+
+  return (
+    <Animated.View layout={descriptionTransition} className="overflow-hidden">
+      <Pressable
+        accessibilityLabel={t("diary.description")}
+        accessibilityRole="button"
+        hitSlop={8}
+        onPress={toggleDescription}
+        className="gap-1.5"
+      >
+        <ThemedText
+          accessible={false}
+          className="absolute left-0 right-0 text-base leading-6 text-white opacity-0"
+          onTextLayout={handleDescriptionLayout}
+        >
+          {description}
+        </ThemedText>
+        <ThemedText
+          className="text-base leading-6 text-white"
+          numberOfLines={isExpanded ? undefined : 3}
+        >
+          {description}
+        </ThemedText>
+        {isExpandable ? (
+          <View className="flex-row items-center gap-1">
+            <ThemedText type="small" className="font-semibold text-white">
+              {isExpanded ? t("common.showLess") : t("common.showMore")}
+            </ThemedText>
+            <Ionicons
+              color={theme.onDark}
+              name={isExpanded ? "chevron-up" : "chevron-down"}
+              size={15}
+            />
+          </View>
+        ) : null}
+      </Pressable>
+    </Animated.View>
+  );
 }
 
 export function FeedItem({
@@ -35,7 +106,6 @@ export function FeedItem({
 }: FeedItemProps) {
   const { t } = useTranslation();
   const theme = useTheme();
-  const [isDescriptionExpanded, setDescriptionExpanded] = useState(false);
   const player = useVideoPlayer(
     { contentType: "progressive", uri: entry.uploadUri },
     (p) => {
@@ -65,18 +135,14 @@ export function FeedItem({
     }
   }
 
-  function toggleDescription() {
-    if (!entry.description) return;
-    setDescriptionExpanded((value) => !value);
-  }
-
-  const overlayBottom = Math.max(18, bottomInset + 18);
+  const overlayBottom = Math.max(26, bottomInset + 28);
   const overlayTop = Math.max(16, topInset + 12);
+  const descriptionTransition = LinearTransition.duration(220);
 
   return (
     <View className="overflow-hidden bg-app-video" style={{ height }}>
       <VideoView
-        style={StyleSheet.absoluteFill}
+        style={[StyleSheet.absoluteFill, { zIndex: 0 }]}
         player={player}
         nativeControls={false}
         contentFit="cover"
@@ -87,7 +153,7 @@ export function FeedItem({
       <Pressable
         accessibilityLabel={isPlaying ? "Pause video" : "Play video"}
         accessibilityRole="button"
-        style={StyleSheet.absoluteFill}
+        style={[StyleSheet.absoluteFill, { zIndex: 2 }]}
         onPress={togglePlayback}
       >
         {!isPlaying ? (
@@ -97,46 +163,33 @@ export function FeedItem({
         ) : null}
       </Pressable>
 
-      <View
-        className="absolute left-5 right-[86px] gap-1.5"
+      <Animated.View
+        layout={descriptionTransition}
+        className="absolute left-4 right-4 flex-row items-end gap-3 rounded-2xl bg-black/55 px-4 py-3"
         style={{
           bottom: overlayBottom,
           maxHeight: Math.max(168, height - overlayTop - overlayBottom),
+          zIndex: 3,
         }}
       >
-        <ThemedText className="text-white/80" type="small">
-          {formatEntryDate(entry.createdAt)}
-        </ThemedText>
-        <ThemedText className="text-[28px] font-bold leading-9 text-white">
-          {entry.name}
-        </ThemedText>
-        {entry.description ? (
-          <Pressable
-            accessibilityLabel={t("diary.description")}
-            accessibilityRole="button"
-            onPress={toggleDescription}
-            className="gap-1"
-          >
-            <ThemedText
-              className="text-base leading-6 text-white/88"
-              numberOfLines={isDescriptionExpanded ? undefined : 3}
-            >
-              {entry.description}
-            </ThemedText>
-            {entry.description.length > 110 ? (
-              <ThemedText type="small" className="font-semibold text-white">
-                {isDescriptionExpanded ? t("common.less") : t("common.more")}
-              </ThemedText>
-            ) : null}
-          </Pressable>
-        ) : (
-          <ThemedText className="text-base text-white/65" numberOfLines={1}>
-            {t("diary.noDescription")}
+        <View className="flex-1 gap-1.5">
+          <ThemedText className="text-white/80" type="small">
+            {formatEntryDate(entry.createdAt)}
           </ThemedText>
-        )}
-      </View>
-
-      <View className="absolute right-4 gap-3.5" style={{ bottom: overlayBottom + 12 }}>
+          <ThemedText className="text-[28px] font-bold leading-9 text-white">
+            {entry.name}
+          </ThemedText>
+          {entry.description ? (
+            <FeedDescription
+              key={`${entry.id}-${entry.description}`}
+              description={entry.description}
+            />
+          ) : (
+            <ThemedText className="text-base text-white/75" numberOfLines={1}>
+              {t("diary.noDescription")}
+            </ThemedText>
+          )}
+        </View>
         <Pressable
           accessibilityLabel={t("common.view")}
           accessibilityRole="button"
@@ -145,7 +198,7 @@ export function FeedItem({
         >
           <Ionicons color={theme.onDark} name="open-outline" size={24} />
         </Pressable>
-      </View>
+      </Animated.View>
     </View>
   );
 }

@@ -20,6 +20,7 @@ import {
 } from "./entry-metadata-form";
 import { UploadingVideoOverlay } from "./uploading-video-overlay";
 import { VideoPickerField } from "./video-picker-field";
+import { VideoSaveProgressPreview } from "./video-save-progress-preview";
 import { VideoTrimStep } from "./video-trim-step";
 
 export type EntryFlowStep = "select" | "trim" | "metadata";
@@ -34,6 +35,7 @@ type NewEntryModalProps = {
   onContinueToMetadata: () => void;
   onPickVideo: () => void;
   onSubmit: (values: EntryMetadataValues) => void;
+  saveProgress: number;
   segmentSeconds: number;
   selectedVideo: SelectedVideo | null;
   step: EntryFlowStep;
@@ -57,6 +59,7 @@ export function NewEntryModal({
   onContinueToMetadata,
   onPickVideo,
   onSubmit,
+  saveProgress,
   segmentSeconds,
   selectedVideo,
   step,
@@ -135,6 +138,12 @@ export function NewEntryModal({
 
               {step === "metadata" ? (
                 <View className="flex-1 gap-4">
+                  {isSaving && selectedVideo ? (
+                    <VideoSaveProgressPreview
+                      progress={saveProgress}
+                      uri={selectedVideo.playbackUri}
+                    />
+                  ) : null}
                   <AppButton
                     variant="ghost"
                     label={t("common.back")}
@@ -156,7 +165,6 @@ export function NewEntryModal({
             {isPreparingVideo ? (
               <UploadingVideoOverlay label={t("diary.preparingVideo")} />
             ) : null}
-            {isSaving ? <UploadingVideoOverlay /> : null}
           </KeyboardAvoidingView>
         </SafeAreaView>
       </ThemedView>

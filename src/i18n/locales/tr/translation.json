@@ -41,7 +41,8 @@
     "updateError": "Kayıt güncellenemedi.",
     "deleteError": "Kayıt silinemedi.",
     "permissionTitle": "İzin gerekli",
-    "permissionMessage": "Video eklemek için medya arşivi erişimi gerekiyor."
+    "permissionMessage": "Video eklemek için medya arşivi erişimi gerekiyor.",
+    "deleteDiaryEntry": "Kaydı Sil"
   },
   "settings": {
     "title": "Ayarlar",
@@ -69,7 +70,9 @@
     "back": "Geri",
     "view": "Görüntüle",
     "more": "Daha fazla",
-    "less": "Daha az"
+    "less": "Daha az",
+    "showMore": "Daha fazla göster",
+    "showLess": "Daha az göster"
   },
   "screens": {
     "diary": {

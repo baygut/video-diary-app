@@ -1,9 +1,15 @@
-import { Directory, File, Paths } from "expo-file-system";
+import { File } from "expo-file-system";
 import { Platform } from "react-native";
 
 import * as VideoThumbnails from "expo-video-thumbnails";
 import { getDb } from "../db/client";
 import { createId } from "../id";
+import {
+  THUMBNAILS_DIRECTORY,
+  UPLOADS_DIRECTORY,
+  createDocumentDirectory,
+  getDocumentFileUri,
+} from "../media-files";
 import { UploadRequestSchema, UploadResponse } from "../schema";
 import { ApiResponse, err, ok } from "../types";
 
@@ -20,6 +26,11 @@ function getVideoExtension(uri: string, mimeType: string): string {
   return (uriExtension ?? MIME_EXTENSIONS[mimeType] ?? "mp4").toLowerCase();
 }
 
+function getFileExtension(uri: string, fallback: string): string {
+  const cleanUri = uri.split("?")[0]?.split("#")[0] ?? uri;
+  return (cleanUri.match(/\.([a-zA-Z0-9]+)$/)?.[1] ?? fallback).toLowerCase();
+}
+
 async function persistVideo(
   uri: string,
   mimeType: string,
@@ -29,17 +40,31 @@ async function persistVideo(
     return uri;
   }
 
-  const uploadsDirectory = new Directory(Paths.document, "uploads");
-  uploadsDirectory.create({ intermediates: true, idempotent: true });
+  const fileName = `${id}.${getVideoExtension(uri, mimeType)}`;
+  const relativePath = `${UPLOADS_DIRECTORY}/${fileName}`;
+  const uploadsDirectory = createDocumentDirectory(UPLOADS_DIRECTORY);
 
   const source = new File(uri);
-  const destination = new File(
-    uploadsDirectory,
-    `${id}.${getVideoExtension(uri, mimeType)}`,
-  );
+  const destination = new File(uploadsDirectory, fileName);
   await source.copy(destination, { overwrite: true });
 
-  return destination.uri;
+  return relativePath;
+}
+
+async function persistThumbnail(uri: string, id: string): Promise<string> {
+  if (Platform.OS === "web") {
+    return uri;
+  }
+
+  const extension = getFileExtension(uri, "jpg");
+  const relativePath = `${THUMBNAILS_DIRECTORY}/${id}.${extension}`;
+  const thumbnailsDirectory = createDocumentDirectory(THUMBNAILS_DIRECTORY);
+
+  const source = new File(uri);
+  const destination = new File(thumbnailsDirectory, `${id}.${extension}`);
+  await source.copy(destination, { overwrite: true });
+
+  return relativePath;
 }
 
 export async function postUpload(
@@ -58,19 +83,20 @@ export async function postUpload(
   });
 
   try {
-    const persistedUri = await persistVideo(uri, mimeType, id);
+    const persistedPath = await persistVideo(uri, mimeType, id);
+    const persistedThumbnailPath = await persistThumbnail(thumbnail.uri, id);
     const db = await getDb();
     await db.runAsync(
       `INSERT INTO uploads (id, uri, mime_type, created_at, thumbnail_uri) VALUES (?, ?, ?, ?, ?)`,
-      [id, persistedUri, mimeType, createdAt, thumbnail.uri],
+      [id, persistedPath, mimeType, createdAt, persistedThumbnailPath],
     );
     return ok(
       {
         id,
-        uri: persistedUri,
+        uri: getDocumentFileUri(persistedPath),
         mimeType,
         createdAt,
-        thumbnailUri: thumbnail.uri,
+        thumbnailUri: getDocumentFileUri(persistedThumbnailPath),
       },
       201,
     );

@@ -1,28 +1,30 @@
-import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { ActivityIndicator, Alert, ScrollView, View } from 'react-native';
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { ActivityIndicator, Alert, ScrollView, View } from "react-native";
 
+import { AppButton } from "@/components/app-button";
 import {
   EntryMetadataForm,
   type EntryMetadataValues,
-} from '@/components/diary/entry-metadata-form';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { useDiary, useUpdateDiary } from '@/hooks/queries';
+} from "@/components/diary/entry-metadata-form";
+import { ThemedText } from "@/components/themed-text";
+import { ThemedView } from "@/components/themed-view";
+import { useDeleteDiary, useDiary, useUpdateDiary } from "@/hooks/queries";
 
 export function DiaryEditScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const entryId = id ?? '';
+  const entryId = id ?? "";
   const { data: diary, isError, isPending } = useDiary(entryId);
   const updateDiary = useUpdateDiary();
+  const deleteDiary = useDeleteDiary();
 
   const initialValues = useMemo<EntryMetadataValues>(
     () => ({
-      name: diary?.name ?? '',
-      description: diary?.description ?? '',
+      name: diary?.name ?? "",
+      description: diary?.description ?? "",
     }),
     [diary?.description, diary?.name],
   );
@@ -41,17 +43,48 @@ export function DiaryEditScreen() {
       router.back();
     } catch (error) {
       Alert.alert(
-        t('common.error'),
-        error instanceof Error ? error.message : t('diary.updateError'),
+        t("common.error"),
+        error instanceof Error ? error.message : t("diary.updateError"),
       );
     }
+  }
+
+  async function handleDelete() {
+    if (!entryId) return;
+
+    Alert.alert(
+      t("diary.deleteConfirmTitle"),
+      t("diary.deleteConfirmMessage"),
+      [
+        {
+          text: t("common.cancel"),
+          style: "cancel",
+        },
+        {
+          text: t("common.delete"),
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteDiary.mutateAsync(entryId);
+              router.dismiss(2);
+            } catch (error) {
+              Alert.alert(
+                t("common.error"),
+                error instanceof Error ? error.message : t("diary.deleteError"),
+              );
+            }
+          },
+        },
+      ],
+      { cancelable: true },
+    );
   }
 
   return (
     <>
       <Stack.Screen
         options={{
-          title: t('diary.editEntry'),
+          title: t("diary.editEntry"),
         }}
       />
 
@@ -65,7 +98,7 @@ export function DiaryEditScreen() {
         {isError ? (
           <View className="flex-1 items-center justify-center px-6">
             <ThemedText themeColor="textSecondary" className="text-center">
-              {t('common.error')}
+              {t("common.error")}
             </ThemedText>
           </View>
         ) : null}
@@ -82,8 +115,14 @@ export function DiaryEditScreen() {
               isSaving={updateDiary.isPending}
               onSubmit={saveEntry}
               requireDirty
-              saveLabel={t('diary.saveChanges')}
-              savingLabel={t('diary.savingChanges')}
+              saveLabel={t("diary.saveChanges")}
+              savingLabel={t("diary.savingChanges")}
+            />
+            <AppButton
+              variant="danger"
+              hapticType="notificationWarning"
+              onPress={handleDelete}
+              label={t("diary.deleteDiaryEntry")}
             />
           </ScrollView>
         ) : null}

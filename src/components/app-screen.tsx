@@ -40,7 +40,9 @@ export function AppScreen({
                 {title ? (
                   <ThemedText
                     type={compactHeader ? "default" : "subtitle"}
-                    className={compactHeader ? "text-2xl font-semibold" : undefined}
+                    className={
+                      compactHeader ? "text-2xl font-semibold" : undefined
+                    }
                   >
                     {title}
                   </ThemedText>

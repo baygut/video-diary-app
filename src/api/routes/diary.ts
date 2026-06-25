@@ -3,6 +3,7 @@ import { Platform } from "react-native";
 
 import { getDb } from "../db/client";
 import { createId } from "../id";
+import { createDocumentFile, resolveStoredMediaUri } from "../media-files";
 import { Diary, DiaryCreateRequestSchema, DiaryUpdateRequestSchema } from "../schema";
 import { ApiResponse, err, ok } from "../types";
 
@@ -22,9 +23,9 @@ function rowToDiary(row: DiaryRow): Diary {
   return {
     id: row.id,
     uploadId: row.upload_id,
-    uploadUri: row.upload_uri,
+    uploadUri: resolveStoredMediaUri(row.upload_uri),
     mimeType: row.mime_type,
-    thumbnailUri: row.thumbnail_uri ?? "",
+    thumbnailUri: resolveStoredMediaUri(row.thumbnail_uri),
     name: row.name,
     description: row.description,
     createdAt: row.created_at,
@@ -178,12 +179,14 @@ export async function updateDiaryById(
 }
 
 function deleteLocalFile(uri: string | null | undefined): void {
-  if (Platform.OS === "web" || !uri?.startsWith("file://")) {
+  if (Platform.OS === "web" || !uri) {
     return;
   }
 
   try {
-    const file = new File(uri);
+    const file = uri.startsWith("file://")
+      ? new File(uri)
+      : createDocumentFile(uri);
 
     if (file.exists) {
       file.delete();
